@@ -69,6 +69,36 @@ Then in any Claude Code session:
 
 If you invoke it bare, Claude asks for a project description first. It also triggers naturally on phrases like *"interview me before we build"* or *"let's scope this before coding."*
 
+## Example session
+
+```text
+> /bucket-ask an app that tracks my freelance invoices and chases late payers
+
+Claude: Before any code — four questions:
+  1. Success in 3 months: fewer late payments, or less time spent chasing? Which one matters more?
+  2. What decision should this drive — when YOU escalate a client, or automating the chasing itself?
+  3. Constraints: is this for you only, or a Micro SaaS from day one? Stack preferences?
+  4. Smallest useful version: would a dashboard showing "who owes what, how late" already help,
+     even with zero automation?
+
+You: (answers)
+
+Claude: Intent anchor — you want to stop losing ~4h/month chasing payments. The core
+decision this drives: which clients get an automated reminder vs. a personal email.
+Success = chase time near zero without damaging client relationships. Confirm?
+
+You: confirmed
+
+Claude: Buckets, riskiest first:
+  1. Invoice ledger + overdue detection (proves the data model works)   ← start here
+  2. Reminder rules engine (auto vs. personal escalation)
+  3. Email sending + templates
+  4. Dashboard UI
+  Reorder, merge, or cut anything?
+```
+
+Each bucket then gets a short plan, the build, and a checkpoint — with a one-line drift check against the intent anchor before the next bucket opens.
+
 ## Credit
 
 The core idea — *interview first, identify the decision the project drives, build in small reviewed increments, verify decisions to prevent drift* — comes from a prompting pattern shared by the community. This skill packages it into a reusable, slash-invocable workflow.
