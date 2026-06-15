@@ -39,10 +39,22 @@ Present the bucket list with a one-line scope per bucket and what "done" looks l
 For each bucket, in order:
 
 1. **Plan** — present a short plan for this bucket only (approach, files touched, anything you'll need from the user). Keep it skimmable, not a design doc.
-2. **Build** — execute the plan.
+2. **Build** — execute the plan (see "Conductor vs. executor" below).
 3. **Checkpoint** — show the output and stop. Summarize what was built, how it maps to the bucket's "done" criteria, and anything you deviated on and why. Wait for the user's review before opening the next bucket.
 
 Never silently roll two buckets together "because they were related" — the checkpoint between them is the point.
+
+### Conductor vs. executor (use subagents for the Build step)
+
+Stay the **conductor**: you hold the intent anchor, run the interview, present buckets, and run every checkpoint and drift check. Those are user-facing and must stay in the main session — never delegate them. But the **Build step is independent, well-scoped implementation work** — exactly what a fresh-context subagent does best, and keeping it out of the main session keeps your intent anchor and checkpoint reasoning uncluttered.
+
+If your harness supports subagents (e.g. Claude Code's Agent tool), dispatch **one executor subagent per bucket** to do the build:
+- **Pass it the intent anchor.** A fresh subagent never saw the interview. Its prompt must carry the goal + core decision + this bucket's scope and "done" criteria + the approved plan — or it will drift exactly the way Phase 1 was meant to prevent.
+- **One subagent per bucket, never one spanning two.** The subagent boundary IS the bucket boundary; the checkpoint barrier between them still holds.
+- **It returns a tight summary only** — what it built, how it maps to "done", deviations — not a transcript. You relay that into the checkpoint.
+- **Model:** use a capable implementation model for the executor and keep planning/judgement (bucketing, checkpoints, drift) in the main session.
+
+If subagents aren't available, build inline — but still keep the Build mechanical and the judgement (plan, checkpoint, drift) deliberate.
 
 ## Drift guard — verify key decisions explicitly
 
